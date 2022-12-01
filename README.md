@@ -25,6 +25,7 @@ nc -w0 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID4
 ```
 
 You should then see the following output in your terminal:
+
 ```
 Jan  1 12:01:21 hostname appname[1234]: message
 ```
@@ -34,13 +35,13 @@ Jan  1 12:01:21 hostname appname[1234]: message
 Download the image:
 
 ```sh
-docker pull cooolinx/tinysyslog
+docker pull cooolin/tinysyslog
 ```
 
 Start the container:
 
 ```sh
-docker run --rm --name tinysyslog -p 5140:5140/udp -d cooolinx/tinysyslog
+docker run --rm --name tinysyslog -p 5140:5140/udp -d cooolin/tinysyslog
 ```
 
 Send a log:
@@ -84,7 +85,7 @@ You can now send logs from your app(s) to `tinysyslog:5140`.
 
 ## Configuration
 ```
-Usage of ./tinysyslog:
+Usage of ./tinysyslogd:
       --address string                         IP and port to listen on. (default "127.0.0.1:5140")
       --filter string                          Filter to filter logs with. Valid filters are: null and regex. Null doesn't do any filtering. (default "null")
       --filter-grok-fields strings             Grok fields to keep.
@@ -116,4 +117,21 @@ Nothing scientific here but with a simple client consisting of a for loop sendin
   126.41 591 72.98
   126.36 590 72.76
   124.76 615 74.95
+```
+
+## Build
+
+Build binary
+
+```sh
+make build -j8
+```
+(see details in `Makefile`)
+
+To build docker image and publish
+
+```sh
+docker build -t tinysyslog .
+docker tag tinysyslog cooolin/tinysyslog
+docker push cooolin/tinysyslog:latest
 ```
