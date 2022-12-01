@@ -31,21 +31,42 @@ type Log struct {
 
 // NewLog creates a Log instance
 func NewLog(logParts map[string]interface{}) Log {
-	sd := parseStructuredData(logParts["structured_data"].(string))
+	var sd map[string]string
+	if logParts["structured_data"] == nil {
+		sd = make(map[string]string)
+	} else {
+		sd = parseStructuredData(logParts["structured_data"].(string))
+	}
 	return Log{
-		AppName:        logParts["app_name"].(string),
-		Client:         logParts["client"].(string),
+		AppName:        getString(logParts["app_name"], "-"),
+		Client:         getString(logParts["client"], "-"),
 		Facility:       logParts["facility"].(int),
-		Hostname:       logParts["hostname"].(string),
-		Message:        logParts["message"].(string),
-		MsgID:          logParts["msg_id"].(string),
+		Hostname:       getString(logParts["hostname"], "-"),
+		Message:        getString(logParts["message"], getString(logParts["content"], "-")),
+		MsgID:          getString(logParts["msg_id"], "-"),
 		Priority:       logParts["priority"].(int),
-		ProcId:         logParts["proc_id"].(string),
+		ProcId:         getString(logParts["proc_id"], "-"),
 		Severity:       logParts["severity"].(int),
 		StructuredData: sd,
 		Timestamp:      logParts["timestamp"].(time.Time),
 		TLSPeer:        logParts["tls_peer"].(string),
-		Version:        logParts["version"].(int),
+		Version:        getInt(logParts["version"], 1),
+	}
+}
+
+func getString(v interface{}, def string) string {
+	if v == nil {
+		return def
+	} else {
+		return v.(string)
+	}
+}
+
+func getInt(v interface{}, def int) int {
+	if v == nil {
+		return def
+	} else {
+		return v.(int)
 	}
 }
 

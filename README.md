@@ -2,7 +2,15 @@
 
 Runnable https://github.com/alexferl/tinysyslog, the original repository seems unmaintained.
 
-A tiny and simple syslog server with log rotation. tinysyslog was born out of the need for a tiny (the binary is currently ~10MB in size), easy to setup and use syslog server that simply writes every incoming log (RFC5424 format) to a file (or to stdout for Docker) that is automatically rotated. tinysyslog is based on [go-syslog](https://github.com/mcuadros/go-syslog) and [lumberjack](https://github.com/natefinch/lumberjack).
+A tiny and simple syslog server with log rotation. tinysyslog was born out of the need for a tiny (the binary is currently ~10MB in size), easy to setup and use syslog server that simply writes every incoming log (RFC5424/RFC3164/RFC6587 format) to a file (or to stdout for Docker) that is automatically rotated. tinysyslog is based on [go-syslog](https://github.com/mcuadros/go-syslog) and [lumberjack](https://github.com/natefinch/lumberjack).
+
+The supported log formats are:
+
+- [RFC5424](https://datatracker.ietf.org/doc/html/rfc5424) (default)
+- [RFC3164](https://datatracker.ietf.org/doc/html/rfc3164) (Golang `log/syslog` use)
+- [RFC6587](https://datatracker.ietf.org/doc/html/rfc6587)
+
+(see [go-syslog/format tests](https://github.com/mcuadros/go-syslog/tree/master/format) for details)
 
 ## Quickstart
 
@@ -17,6 +25,7 @@ INFO[0000] tinysyslog listening on 127.0.0.1:5140
 ```
 
 You can take make sure logs are processed by the server by entering the following in a terminal:
+
 ```sh
 # udp
 nc -w0 -u 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
@@ -30,15 +39,20 @@ You should then see the following output in your terminal:
 Jan  1 12:01:21 hostname appname[1234]: message
 ```
 
-## Docker Quickstart
-
-Download the image:
+More supported message formats:
 
 ```sh
-docker pull cooolin/tinysyslog
+# RFC5424
+nc -w0 -u 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
+# RFC3164
+nc -w0 -u 127.0.0.1 5140 <<< '<7>2022-12-01T18:49:08+08:00 ColinM1Pro.local app.wum.app[38277]: message'
+# RFC6587
 ```
 
-Start the container:
+
+## Docker Quickstart
+
+Run:
 
 ```sh
 docker run --rm --name tinysyslog -p 5140:5140/udp -d cooolin/tinysyslog
@@ -87,6 +101,7 @@ You can now send logs from your app(s) to `tinysyslog:5140`.
 ```
 Usage of ./tinysyslogd:
       --address string                         IP and port to listen on. (default "127.0.0.1:5140")
+      --format string                          Which log format will use: RFC5424, RFC3164, RFC6587. (default: auto)
       --filter string                          Filter to filter logs with. Valid filters are: null and regex. Null doesn't do any filtering. (default "null")
       --filter-grok-fields strings             Grok fields to keep.
       --filter-grok-pattern string             Grok pattern to filter with.
@@ -134,4 +149,9 @@ To build docker image and publish
 docker build -t tinysyslog .
 docker tag tinysyslog cooolin/tinysyslog
 docker push cooolin/tinysyslog:latest
+
+# or, for multi-arch build (see https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/)
+docker buildx build \
+  --platform linux/arm64,linux/arm/v7,linux/amd64 \
+  --push --tag cooolin/tinysyslog:latest .
 ```

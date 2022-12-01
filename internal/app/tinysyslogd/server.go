@@ -43,8 +43,22 @@ func (s *Server) Run() error {
 	handler := syslog.NewChannelHandler(channel)
 
 	server := syslog.NewServer()
-	server.SetFormat(syslog.RFC5424)
 	server.SetHandler(handler)
+
+	format := viper.GetString("format")
+	switch strings.ToUpper(format) {
+	case "RFC5424":
+		server.SetFormat(syslog.RFC5424)
+		break;
+	case "RFC3164":
+		server.SetFormat(syslog.RFC3164)
+		break;
+	case "RFC6587":
+		server.SetFormat(syslog.RFC6587)
+		break;
+	default:
+		server.SetFormat(syslog.Automatic)
+	}
 
 	address := viper.GetString("bind-address")
 

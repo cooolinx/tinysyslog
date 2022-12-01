@@ -13,6 +13,7 @@ import (
 // Config holds all configuration for our program
 type Config struct {
 	BindAddress       string
+	Format            string
 	ConsoleSink       ConsoleSink
 	ElasticSearchSink ElasticSearchSink
 	FilesystemSink    FilesystemSink
@@ -63,6 +64,7 @@ type RegexFilter struct {
 func NewConfig() *Config {
 	cnf := Config{
 		BindAddress: "127.0.0.1:5140",
+		Format: "",
 		ConsoleSink: ConsoleSink{
 			Output: "stdout",
 		},
@@ -97,6 +99,7 @@ func NewConfig() *Config {
 // addFlags adds all the flags from the command line and the config file
 func (cnf *Config) addFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&cnf.BindAddress, "bind-address", cnf.BindAddress, "IP and port to listen on.")
+	fs.StringVar(&cnf.Format, "format", cnf.Format, "Which log format will use: RFC5424, RFC3164, RFC6587.")
 	fs.StringVar(&cnf.FilterType, "filter", cnf.FilterType,
 		"Filter to filter logs with. Valid filters are: 'null', 'regex'. Null doesn't do any filtering.")
 	fs.StringSliceVar(&cnf.GrokFilter.Fields, "filter-grok-fields", cnf.GrokFilter.Fields,
