@@ -2,9 +2,9 @@
 
 Runnable https://github.com/alexferl/tinysyslog, the original repository seems unmaintained.
 
-A tiny and simple syslog server with log rotation. tinysyslog was born out of the need for a tiny (the binary is currently ~10MB in size), easy to setup and use syslog server that simply writes every incoming log (RFC5424/RFC3164/RFC6587 format) to a file (or to stdout for Docker) that is automatically rotated. tinysyslog is based on [go-syslog](https://github.com/mcuadros/go-syslog) and [lumberjack](https://github.com/natefinch/lumberjack).
+A tiny and simple syslog server with log rotation. tinysyslog was born out of the need for a tiny (the binary is currently ~10MB in size), easy to setup and use syslog server that simply writes every incoming log (automatic detect RFC5424/RFC3164/RFC6587 format) to a file (or to stdout for Docker) that is automatically rotated. tinysyslog is based on [go-syslog](https://github.com/mcuadros/go-syslog) and [lumberjack](https://github.com/natefinch/lumberjack).
 
-The supported log formats are:
+Supported log formats:
 
 - [RFC5424](https://datatracker.ietf.org/doc/html/rfc5424) (default)
 - [RFC3164](https://datatracker.ietf.org/doc/html/rfc3164) (Golang `log/syslog` use)
@@ -27,10 +27,10 @@ INFO[0000] tinysyslog listening on 127.0.0.1:5140
 You can take make sure logs are processed by the server by entering the following in a terminal:
 
 ```sh
-# udp
+# udp for RFC5424
 nc -w0 -u 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
-# tcp
-nc -w0 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
+# tcp for RFC3164
+nc -w0 127.0.0.1 5140 <<< '<7>2022-12-01T18:49:08+08:00 ColinM1Pro.local app.wum.app[38277]: message'
 ```
 
 You should then see the following output in your terminal:
@@ -38,17 +38,6 @@ You should then see the following output in your terminal:
 ```
 Jan  1 12:01:21 hostname appname[1234]: message
 ```
-
-More supported message formats:
-
-```sh
-# RFC5424
-nc -w0 -u 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
-# RFC3164
-nc -w0 -u 127.0.0.1 5140 <<< '<7>2022-12-01T18:49:08+08:00 ColinM1Pro.local app.wum.app[38277]: message'
-# RFC6587
-```
-
 
 ## Docker Quickstart
 
