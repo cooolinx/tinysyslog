@@ -22,7 +22,8 @@ _testmain.go
 *.exe
 *.test
 *.prof
+.DS_Store
 
 *.log
 .idea
-tinysyslogd
+/tinysyslogd

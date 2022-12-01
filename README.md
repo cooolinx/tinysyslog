@@ -1,22 +1,27 @@
 # tinysyslog
-[![Go Report Card](http://goreportcard.com/badge/admiralobvious/tinysyslog)](http://goreportcard.com/report/admiralobvious/tinysyslog)
+
+Runnable https://github.com/alexferl/tinysyslog, the original repository seems unmaintained.
 
 A tiny and simple syslog server with log rotation. tinysyslog was born out of the need for a tiny (the binary is currently ~10MB in size), easy to setup and use syslog server that simply writes every incoming log (RFC5424 format) to a file (or to stdout for Docker) that is automatically rotated. tinysyslog is based on [go-syslog](https://github.com/mcuadros/go-syslog) and [lumberjack](https://github.com/natefinch/lumberjack).
 
 ## Quickstart
-To install tinysyslog:
 
-    go get -u github.com/admiralobvious/tinysyslog
-And then to run it (from your $GOPATH/bin folder):
+To run tinysyslog:
+```sh
+go run cmd/tinysyslogd/main.go
+```
 
-    ./tinysyslog
 If tinysyslog started properly you should see:
 ```
 INFO[0000] tinysyslog listening on 127.0.0.1:5140
 ```
+
 You can take make sure logs are processed by the server by entering the following in a terminal:
-```
+```sh
+# udp
 nc -w0 -u 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
+# tcp
+nc -w0 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
 ```
 
 You should then see the following output in your terminal:
@@ -25,27 +30,38 @@ Jan  1 12:01:21 hostname appname[1234]: message
 ```
 
 ## Docker Quickstart
+
 Download the image:
 
-    docker pull admiralobvious/tinysyslog
-    
+```sh
+docker pull cooolinx/tinysyslog
+```
+
 Start the container:
 
-    docker run --rm --name tinysyslog -p 5140:5140/udp -d admiralobvious/tinysyslog
+```sh
+docker run --rm --name tinysyslog -p 5140:5140/udp -d cooolinx/tinysyslog
+```
 
 Send a log:
 
-    nc -w0 -u 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
+```sh
+nc -w0 -u 127.0.0.1 5140 <<< '<165>1 2016-01-01T12:01:21Z hostname appname 1234 ID47 [exampleSDID@32473 iut="9" eventSource="test" eventID="123"] message'
+```
 
 Confirm the container received it:
 
-    docker logs tinysyslog
+```sh
+docker logs tinysyslog
+```
+
 ```
 time="2018-11-15T19:40:22Z" level=info msg="tinysyslog listening on 0.0.0.0:5140"
 Jan  1 12:01:21 hostname appname[1234]: message
 ```
 
 ## Kubernetes Quickstart
+
 Apply the manifest to your cluster:
 
     kubectl apply -f kubernetes/tinysyslog.yaml
