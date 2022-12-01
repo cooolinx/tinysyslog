@@ -55,7 +55,7 @@ nc -w0 -u 127.0.0.1 5140 <<< '<7>2022-12-01T18:49:08+08:00 ColinM1Pro.local app.
 Run:
 
 ```sh
-docker run --rm --name tinysyslog -p 5140:5140/udp -d cooolin/tinysyslog
+docker run --rm --name tinysyslog -p 5140:5140/udp -p 5140:5140/tcp -d cooolin/tinysyslog
 ```
 
 Send a log:
